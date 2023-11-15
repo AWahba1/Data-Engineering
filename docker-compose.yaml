@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  pgdatabase:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=green_taxis
+    volumes:
+      - "green_taxi_4_2015_postgres:/var/lib/postgresql/data"
+      - "./m2_queries:/var/lib"
+    ports:
+      - "5432:5432"
+  ingest_database:
+    build: .
+    image: ingest_db:v1
+    depends_on:
+      - pgdatabase
+    restart: on-failure
+    volumes:
+      - "./src:/app/src"
+      - "./data:/app/data"
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=wahba@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=wahba
+    ports:
+      - "8000:80"
+    depends_on:
+      - pgdatabase
+volumes:
+   green_taxi_4_2015_postgres:
